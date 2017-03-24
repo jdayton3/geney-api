@@ -8,7 +8,7 @@ query:  none
 
 response:  json array of strings, each the name of a dataset
 
-```
+```json
 ["Sample Dataset","Sample Dataset 1"]
 ```
 
@@ -17,7 +17,7 @@ get:  `/api/meta/x`
 query: 	none
 
 response:  metadata for dataset "x" if "x" exists, else 404. x is the name of the dataset lowercase without spaces
-```
+```json
 {  
   "info":{  
     "numMetaTypes":1,
@@ -47,7 +47,7 @@ post:  `/api/samples`
 
 query:  json object with dataset name and selected meta features
 
-```
+```json
 {  
   "dataset":"sampledataset",
   "meta":{  
@@ -61,7 +61,7 @@ query:  json object with dataset name and selected meta features
 
 response:  number of samples matched by the filters
 
-```
+```json
 {  
   "samples":65
 }
@@ -77,7 +77,7 @@ Download options:
 - Filename: string
 - MORE TO COME!
 
-```
+```json
 {  
   "dataset":"sampledataset",
   "meta":{  
@@ -99,7 +99,7 @@ Download options:
 Response:  Set the following headers:
 
 ```
-Content-Type : text/x
+Content-Type: text/x
 Content-disposition: attachment; filename=example.csv
 ```
 
