@@ -1,109 +1,124 @@
-# Geney API
+# BioGeney Server API
 
-## GET requests
 
-get:  `/api/datasets`
+### get:  `/api/datasets`
 
-query:  none
+##### query:  none
 
-response:  json array of strings, each the name of a dataset
+##### response: json array of objects, with the below properties
 
-```json
-["Sample Dataset","Sample Dataset 1"]
+```js
+[
+  {
+    "numMetaTypes": 1,
+    "numSamples": 123,
+    "numGenes": 3,
+    "description": "<h1>Description</h1>",
+    "name": "Sample Dataset",
+    "id": "sampledataset"
+  }
+]
 ```
 
-get:  `/api/meta/x`
+### get: `/api/meta/id`
 
-query: 	none
+##### query: `none`
 
-response:  metadata for dataset "x" if "x" exists, else 404. x is the name of the dataset lowercase without spaces
-```json
-{  
-  "info":{  
-    "numMetaTypes":1,
-    "numSamples":123,
-    "numGenes":3,
-    "description":"<h1>Description</h1>",
-    "title":"Sample Dataset"
-  },
-  "meta":{  
-    "variable1":[  
-      "option1",
-      "option2",
-      "option3"
-    ]
-  },
-  "genes":[  
-    "gene1",
-    "gene2",
-    "gene3"
-  ]
+##### response:
+
+```js
+{
+    "meta": {
+        "variable1": {
+            numOptions: 3,
+            options: ["option1","option2","option3"]
+    },
+    "genes": {
+        numOptions: 190000,
+        options: null
 }
 ```
 
-## POST requests
+If options is null, that means the front end needs to make a query to the backend whenever the user wants to see the page
 
-post:  `/api/samples`
+### get: `/api/meta/id/gene?search=str`
 
-query:  json object with dataset name and selected meta features
+query: 	
+
+search: string of users typed in search
+
+response:
 
 ```json
-{  
-  "dataset":"sampledataset",
-  "meta":{  
-    "variable1":[  
-      "option1",
-      "option3"
-    ]
+["gene1","gene2"]
+```
+
+### get: `/api/meta/id/metaType/var1?search=str`
+
+query: 
+
+search: string to match `metaType[var1]`
+
+response: array of strings that match the search term
+
+```json
+["val1", "val2"]
+```
+
+### post: `/api/id/samples`
+
+query:
+
+json object with dataset name and selected meta features
+
+```json
+{
+  "meta": {
+    "variable1": ["option1","option3"]
   }
 }
 ```
 
-response:  number of samples matched by the filters
+response: 	
+
+number of samples matched by the filters
 
 ```json
-{  
-  "samples":65
+{
+  "samples": 65
 }
 ```
 
-post:  `/api/download`
+### post: `/api/id/download`
 
-query:  JSON object with dataset name, selected meta features, download options, and desired genes. An empty list of genes means the user wants ALL genes.
+query: 	
+
+JSON object with dataset name, selected meta features, download options, and desired genes. An empty list of genes means the user wants ALL genes.
 
 Download options:
-
-- fileformats: ["csv","tsv","gct","json"]
-- Filename: string
-- MORE TO COME!
+	fileformats: ["csv","tsv","gct","json"]
+	Filename: string
+	MORE TO COME!
 
 ```json
-{  
-  "dataset":"sampledataset",
-  "meta":{  
-    "variable1":[  
-      "option1",
-      "option3"
-    ]
+{
+  "meta": {
+    "variable1": ["option1","option3"]
   },
-  "options":{  
-    "fileformat":"csv",
-    "filename":"example"
-  },
-  "genes":[  
-
-  ]
+  "options": {
+    "fileformat": "csv",
+    "filename": "example"
+  }
+  "genes": []
 }
 ```
 
-Response:  Set the following headers:
+Response:
 
-```
-Content-Type: text/x
-Content-disposition: attachment; filename=example.csv
-```
+Set the following headers:
 
-And somehow serve the file.
-
-_Replace `x` and `example.csv` with the correct values._
+"Content-Type" : "text/`x`"
+"Content-disposition":"attachment; filename=`example.csv`"
+		
+Replace the code sections with the correct values.
 

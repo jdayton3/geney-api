@@ -39,8 +39,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(bytes(response, 'utf8'))
         except:
-            self.send_file("file.csv")
-            return
             self.send_404()
 
     def do_POST(self):
@@ -48,6 +46,12 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             self.api_obj = APIObj()
             path_list = urlsplit(self.path).path.split("/")
             if path_list[1] == "api":
+                try:
+                    if path_list[2] in self.api_obj.meta.keys() and path_list[3] == "download":
+                        self.send_file()
+                        return
+                except:
+                    pass
                 self.send_response(200)
                 self.end_headers()
                 content_len = int(self.headers.get('content-length', 0))
@@ -72,6 +76,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         f = open(path, 'rb')
         while True:
             file_data = f.read(16777216) # Read a max of 16 MiB
+            # TODO: figure out if this ^ is faster if we do like 16 KiB instead.
             if file_data is None or len(file_data) == 0:
                 break
             self.wfile.write(file_data)
