@@ -5,8 +5,11 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlsplit, parse_qs
 from data_access import APIObj
+from socketserver import ThreadingMixIn
 import json
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -68,11 +71,11 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         f = open(path, 'rb')
         while True:
-            file_data = f.read(1024)
+            file_data = f.read(16777216) # Read a max of 16 MiB
             if file_data is None or len(file_data) == 0:
                 break
             self.wfile.write(file_data)
-            print("Data written...")
+#            print("Data written...")
         f.close()
 
 def run():
@@ -80,7 +83,7 @@ def run():
 
     # Server settings
     server_address = ('', 8000)
-    httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
+    httpd = ThreadedHTTPServer(server_address, testHTTPServer_RequestHandler)
     print('running server...')
     httpd.serve_forever()
 
