@@ -1,5 +1,8 @@
 # BioGeney Server API
 
+## [Glorious tutorial on APIs, Python, and Flask.](https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask)
+
+[Helpful tutorial on testing Flask apps](http://flask.pocoo.org/docs/0.12/testing/)
 
 ### get:  `/api/datasets`
 
