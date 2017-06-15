@@ -3,7 +3,8 @@ from flask import Flask, make_response, jsonify
 
 # TODO: rename this class
 class MyAPI:
-    def __init__(self):
+    def __init__(self, data_access_obj):
+        self.dao = data_access_obj
         self.app = Flask(__name__)
         thing = []
         self.app.add_url_rule('/api/datasets', 'datasets', self.datasets)
@@ -17,11 +18,11 @@ class MyAPI:
 
     #@app.route('/api/datasets')
     def datasets(self):
-        return jsonify([])
+        return jsonify(self.dao.get_datasets())
 
     #@app.route('/api/meta/<string:dataset_id>', methods=['GET'])
     def meta(self, dataset_id):
-        return jsonify({"thing": "You input a dataset id: %s" % dataset_id})
+        return jsonify(self.dao.get_meta(dataset_id))
 
 if __name__ == '__main__':
     api = MyAPI()
