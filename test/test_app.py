@@ -46,10 +46,10 @@ class TestDatasets(RouteTester):
 
     def test_ResponseIsJsonArray(self):
         try:
-            expected = json.loads(self.response.data)
+            actual = json.loads(self.response.data)
         except ValueError as e:
             self.fail("Failed to load JSON (%s). %s" % (self.response.data, e))
-        self.assertEqual(list, type(expected))
+        self.assertEqual(list, type(actual))
 
     def test_ResponseIsAsDefinedByDocumentation(self):
         self.assertEqual(self.datasets, json.loads(self.response.data))
@@ -76,22 +76,37 @@ class TestMeta(RouteTester):
 
     def test_ResponseIsJsonObj(self):
         try:
-            expected = json.loads(self.response.data)
+            actual = json.loads(self.response.data)
         except ValueError as e:
             self.fail("Failed to load JSON (%s). %s" % (self.response.data, e))
-        self.assertEqual(dict, type(expected))
+        self.assertEqual(dict, type(actual))
 
     def test_ResponseIsAsDefinedByDocumentation(self):
         self.assertEqual(self.meta, json.loads(self.response.data))
 
-class TestGene(RouteTester):
+class TestGeneSearchRoute(RouteTester):
     def setUp(self):
         super(self.__class__, self).setUp()
         self.response = self.app.get("/api/meta/sampledataset/gene?search=gene")
         self.genes = ["gene1", "gene2"]
 
-    def test_GeneSearchRouteExists(self):
-        self.assertEqual(self.response.status_code, 200)
+    def test_RouteExists(self):
+        self.assertEqual(200, self.response.status_code)
+
+    def test_ResponseIsJsonArray(self):
+        try:
+            actual = json.loads(self.response.data)
+        except ValueError as e:
+            self.fail("Failed to load JSON (%s). %s" % (self.response.data, e))
+        self.assertEqual(list, type(actual))
+
+    def test_ResponseIsAsDefinedByDocumentation(self):
+        self.assertEqual(self.genes, json.loads(self.response.data))
+
+    def test_SearchWorks(self):
+        self.response = self.app.get("/api/meta/sampledataset/gene?search=ene1")
+        expected = ["gene1"]
+        self.assertEqual(expected, json.loads(self.response.data))
 
     def test_NextSteps(self):
         message = "I need to include a DBAccess object in the __init__ function of MyAPI"
