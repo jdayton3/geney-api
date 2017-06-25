@@ -125,3 +125,6 @@ Set the following headers:
 		
 Replace the code sections with the correct values.
 
+## Notes:
+
+Maybe it's better to have a data_access::DataObj object that has a Flask object?
