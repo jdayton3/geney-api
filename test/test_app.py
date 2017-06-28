@@ -168,9 +168,45 @@ class TestMetaSearch(RouteTester):
 
 class TestSamples(RouteTester):
     def post_request(self, dataset_id, post_data):
+        post_data = json.dumps(post_data)
         route = "/api/%s/samples" % dataset_id
         response = self.app.post(route, data=post_data)
         return response
+
+    def empty_query(self, dataset_id="sampledataset"):
+        data = {"meta": {}}
+        return self.post_request(dataset_id, data)
     
-    def test_WorkOnThis(self):
-        self.fail("I need to figure out if I'm doing the post request right..")
+    def test_RouteExists(self):
+        response = self.empty_query()
+        self.assertEqual(200, response.status_code)
+
+    def test_ResponseIsValidJsonObj(self):
+        response = self.empty_query()
+        obj = json.loads(response.data)
+        self.assertEqual(dict, type(obj))
+
+    def test_404ErrorForInvalidQueryObject(self):
+        data = {}
+        response = self.post_request("sampledataset", data)
+        self.assertEqual(404, response.status_code)
+
+    def test_ResponseHasSamplesKey(self):
+        response = self.empty_query()
+        obj = json.loads(response.data)
+        self.assertEqual("samples", obj.keys()[0])
+        self.assertEqual(1, len(obj.keys()))
+
+    # There are 123 fake samples.  There are three options in the "variable1"
+    # meta type, and we're assuming that the samples are equally divided 
+    # across the three values.
+    def test_SamplesIs123ForEmptyQueryObject(self):
+        response = self.empty_query()
+        obj = json.loads(response.data)
+        self.assertEqual(123, obj["samples"])
+
+    def test_SamplesIs82ForTwoValQuery(self):
+        data = {"meta": {"variable1": ["option1", "option2"]}}
+        response = self.post_request("sampledataset", data)
+        obj = json.loads(response.data)
+        self.assertEqual(82, obj["samples"])

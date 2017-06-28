@@ -17,6 +17,9 @@ class MyAPI:
         self.app.add_url_rule('/api/meta/<string:dataset_id>/metaType/<string:variable>',
                               view_func=self.meta_search,
                               methods=["GET"])
+        self.app.add_url_rule('/api/<string:dataset_id>/samples',
+                              view_func=self.samples,
+                              methods=["POST"])
         self.app.register_error_handler(404, self.not_found)
 
     def not_found(self, error):
@@ -38,6 +41,17 @@ class MyAPI:
         return jsonify(
             [x for x in vals if search in x]
         )
+
+    def samples(self, dataset_id):
+        try:
+            posted = request.get_json(force=True)
+            variables = posted["meta"]
+        except:
+            return self.not_found(
+                'The request was not valid.  Must be JSON with "meta" key.'
+            )
+        n_samples = self.dao.num_samples(dataset_id, variables)
+        return jsonify({"samples": n_samples})
 
 if __name__ == '__main__':
     api = MyAPI()
