@@ -210,3 +210,44 @@ class TestSamples(RouteTester):
         response = self.post_request("sampledataset", data)
         obj = json.loads(response.data)
         self.assertEqual(82, obj["samples"])
+
+class TestDownloadFile(RouteTester):
+    def post_request(self, dataset_id, post_data):
+        post_data = json.dumps(post_data)
+        route = "/api/%s/download" % dataset_id
+        response = self.app.post(route, data=post_data)
+        return response
+
+    def basic_query(self, dataset_id="sampledataset"):
+        data = {
+            "query": {
+                "meta": {
+                    "variable1": ["option1", "option3"]
+                },
+                "genes": [],
+                "options": {
+                    "fileformat": "csv",
+                    "filename": "example"
+                }
+            }
+        }
+        return self.post_request(dataset_id, data)
+    
+    def test_RouteExists(self):
+        response = self.basic_query()
+        self.assertEqual(200, response.status_code)
+
+    def test_DownloadsCsv(self):
+        response = self.basic_query()
+        self.assertRegexpMatches(response.headers["Content-Type"], "text/csv")
+        self.assertRegexpMatches(
+            response.headers["Content-Disposition"], "attachment"
+        )
+        # TODO: this only checks that the mimetype is correct, not that the
+        # actual body is a CSV...
+
+    def test_CorrectFilename(self):
+        response = self.basic_query()
+        self.assertRegexpMatches(
+            response.headers["Content-Disposition"], "filename=example.csv"
+        )

@@ -1,5 +1,5 @@
 #!flask/bin/python
-from flask import Flask, make_response, jsonify, request
+from flask import Flask, make_response, jsonify, request, Response
 
 # TODO: rename this class
 class MyAPI:
@@ -19,6 +19,9 @@ class MyAPI:
                               methods=["GET"])
         self.app.add_url_rule('/api/<string:dataset_id>/samples',
                               view_func=self.samples,
+                              methods=["POST"])
+        self.app.add_url_rule('/api/<string:dataset_id>/download',
+                              view_func=self.download,
                               methods=["POST"])
         self.app.register_error_handler(404, self.not_found)
 
@@ -53,6 +56,13 @@ class MyAPI:
         n_samples = self.dao.num_samples(dataset_id, variables)
         return jsonify({"samples": n_samples})
 
+    def download(self, dataset_id):
+        def generate():
+            for i in range(100):
+                yield ','.join([c for c in "abcdefghijklmnop"]) + "\n"
+        return Response(generate(), mimetype='text/csv', headers={"Content-Disposition": "attachment; filename=thing.csv"})
+
 if __name__ == '__main__':
-    api = MyAPI()
+    from data_access import DataObj
+    api = MyAPI(DataObj())
     api.app.run(debug=True)
