@@ -111,7 +111,7 @@ Download options:
   "options": {
     "fileformat": "csv",
     "filename": "example"
-  }
+  },
   "genes": []
 }
 ```
