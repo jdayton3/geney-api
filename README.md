@@ -1,14 +1,12 @@
-# BioGeney Server API
+# Geney Server API
 
-## [Glorious tutorial on APIs, Python, and Flask.](https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask)
+[Main repository](https://github.com/srp33/Geney).
 
-[Helpful tutorial on testing Flask apps](http://flask.pocoo.org/docs/0.12/testing/)
+### GET:  `/api/datasets`
 
-### get:  `/api/datasets`
+##### Query:  none
 
-##### query:  none
-
-##### response: json array of objects, with the below properties
+##### Response: json array of objects, with the below properties
 
 ```js
 [
@@ -23,11 +21,11 @@
 ]
 ```
 
-### get: `/api/meta/id`
+### GET: `/api/meta/id`
 
-##### query: `none`
+##### Query: none
 
-##### response:
+##### Response:
 
 ```js
 {
@@ -44,35 +42,35 @@
 
 If options is null, that means the front end needs to make a query to the backend whenever the user wants to see the page
 
-### get: `/api/meta/id/gene?search=str`
+### GET: `/api/meta/id/gene?search=str`
 
-query: 	
+##### Query: 	
 
-search: string of users typed in search
+- `search`: string to search for in the list of genes
 
-response:
+##### Response:
 
 ```json
 ["gene1","gene2"]
 ```
 
-### get: `/api/meta/id/metaType/var1?search=str`
+### GET: `/api/meta/id/metaType/var1?search=str`
 
-query: 
+##### Query: 
 
-search: string to match `metaType[var1]`
+- `search`: string to match `metaType[var1]`
 
-response: array of strings that match the search term
+##### Response: array of strings that match the search term
 
 ```json
 ["val1", "val2"]
 ```
 
-### post: `/api/id/samples`
+### POST: `/api/id/samples`
 
-query:
+##### Query:
 
-json object with dataset name and selected meta features
+JSON object with dataset name and selected meta features
 
 ```json
 {
@@ -82,9 +80,9 @@ json object with dataset name and selected meta features
 }
 ```
 
-response: 	
+##### Response: 	
 
-number of samples matched by the filters
+JSON object containing the number of samples matched by the filters
 
 ```json
 {
@@ -92,16 +90,17 @@ number of samples matched by the filters
 }
 ```
 
-### post: `/api/id/download`
+### POST: `/api/id/download`
 
-query: 	
+##### Query: 	
 
 JSON object with dataset name, selected meta features, download options, and desired genes. An empty list of genes means the user wants ALL genes.
 
 Download options:
-	fileformats: ["csv","tsv","gct","json"]
-	Filename: string
-	MORE TO COME!
+
+- fileformats: ["csv","tsv","gct","json"]
+- filename: string
+- MORE TO COME!
 
 ```json
 {
@@ -116,15 +115,20 @@ Download options:
 }
 ```
 
-Response:
+##### Response:
 
 Set the following headers:
 
-"Content-Type" : "text/`x`"
+"Content-Type" : "text/`csv`"  
 "Content-disposition":"attachment; filename=`example.csv`"
 		
-Replace the code sections with the correct values.
+(Replace the code sections with the correct values.)
+
+The file to be downloaded will be the response body.
+
+## Resources: 
+
+- [Tutorial on APIs, Python, and Flask.](https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask)
+- [Helpful tutorial on testing Flask apps](http://flask.pocoo.org/docs/0.12/testing/)
 
 ## Notes:
-
-Maybe it's better to have a data_access::DataObj object that has a Flask object?
