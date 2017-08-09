@@ -60,7 +60,20 @@ class MyAPI:
         def generate():
             for i in range(100):
                 yield ','.join([c for c in "abcdefghijklmnop"]) + "\n"
-        return Response(generate(), mimetype='text/csv', headers={"Content-Disposition": "attachment; filename=thing.csv"})
+        try:
+            posted = request.get_json(force=True)
+            filename = posted["query"]["options"]["filename"]
+        except:
+            return self.not_found(
+                'The request was not valid.  Must be JSON with "filename" key.'
+            )
+        return Response(
+            generate(),
+            mimetype='text/csv',
+            headers={
+                "Content-Disposition": "attachment; filename=%s.csv" % filename
+            }
+        )
 
 if __name__ == '__main__':
     from data_access import DataObj

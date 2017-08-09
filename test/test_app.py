@@ -251,3 +251,9 @@ class TestDownloadFile(RouteTester):
         self.assertRegexpMatches(
             response.headers["Content-Disposition"], "filename=example.csv"
         )
+
+    def test_CorrectFileLength(self):
+        response = self.basic_query()
+        expected = 82
+        actual = len(response.data.split("\n")) - 1
+        self.assertEqual(expected, actual)

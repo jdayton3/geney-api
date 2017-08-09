@@ -132,3 +132,5 @@ The file to be downloaded will be the response body.
 - [Helpful tutorial on testing Flask apps](http://flask.pocoo.org/docs/0.12/testing/)
 
 ## Notes:
+
+- For downloading, what should we do if someone requests an invalid filename? (would that potentially be a problem?)
