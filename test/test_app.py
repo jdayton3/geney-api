@@ -57,7 +57,7 @@ class TestDatasets(RouteTester):
 class TestMeta(RouteTester):
     def setUp(self):
         super(self.__class__, self).setUp()
-        self.response = self.app.get('/api/meta/sampledataset')
+        self.response = self.app.get('/api/datasets/sampledataset/meta')
         self.meta = {
             "meta": {
                 "variable1": {
@@ -96,8 +96,11 @@ class TestMeta(RouteTester):
 class TestGeneSearchRoute(RouteTester):
     def setUp(self):
         super(self.__class__, self).setUp()
-        self.response = self.app.get("/api/meta/sampledataset/gene?search=gene")
+        self.response = self.search("gene")
         self.genes = ["gene1", "gene2"]
+
+    def search(self, search_str):
+        return self.app.get("/api/datasets/sampledataset/meta/gene/search/" + search_str)
 
     def test_RouteExists(self):
         self.assertEqual(200, self.response.status_code)
@@ -113,18 +116,13 @@ class TestGeneSearchRoute(RouteTester):
         self.assertEqual(self.genes, json.loads(self.response.data))
 
     def test_SearchWorks(self):
-        self.response = self.app.get("/api/meta/sampledataset/gene?search=ene1")
+        self.response = self.search("ene1")
         expected = ["gene1"]
         self.assertEqual(expected, json.loads(self.response.data))
 
-    def test_NoGenesFoundReturnsEmptyString(self):
-        self.response = self.app.get("/api/meta/sampledataset/gene?search=cantfindme")
+    def test_NoGenesFoundReturnsEmptyArray(self):
+        self.response = self.search("cantfindme")
         expected = []
-        self.assertEqual(expected, json.loads(self.response.data))
-
-    def test_EmptySearchStringReturnsAllVals(self):
-        self.response = self.app.get("/api/meta/sampledataset/gene?search=")
-        expected = ['gene1', 'gene2', "AF10", "ALOX12", "ARHGEF12", "RNT", "AXL", "BAX", "BCL3", "CL6", "BTG1", "AV1", "CBFB", "DC23", "DH17", "CDX2", "CEBPA", "CLC", "R1", "CREBBP", "EK", "DLEU1", "DLEU2", "GFR", "ETS1", "EVI2A", "EVI2B", "OXO3A", "FUS", "LI2", "MPS", "HOX11", "OXA9", "RF1", "IT", "AF4", "LCP1", "LDB1", "LMO1", "LMO2", "LYL1", "ADH5", "LL3", "LLT2", "LLT3", "MOV10L1", "TCP1", "YC", "NFKB2", "OTCH1", "NOTCH3", "PM1", "UP214", "NUP98", "BX1", "BX2", "BX3", "BXP1", "ITX2", "PML", "AB7", "GS2", "RUNX1", "ET", "P140", "AL1", "AL2", "TCL1B", "TCL6", "THRA", "TRA", "NFN1A1"]
         self.assertEqual(expected, json.loads(self.response.data))
 
 class TestMetaSearch(RouteTester):
@@ -133,36 +131,41 @@ class TestMetaSearch(RouteTester):
         response = self.app.get(request)
         return response
 
-    def make_request(self, id, variable, search):
+    def make_route(self, id, variable, search):
         request = "/api/meta/%s/metaType/%s?search=%s" % (id, variable, search)
         return request
 
     def test_SearchReturns200Response(self):
-        route = self.make_request("sampledataset", "var1", "val")
+# Unchanged
+        route = self.make_route("sampledataset", "var1", "val")
         response = self.send_request(route)
         self.assertEqual(200, response.status_code)
 
     def test_ResponseIsAsDefinedByDocumentation(self):
+# Unchanged
         expected = ["val1", "val2"]
-        route = self.make_request("sampledataset", "var1", "val")
+        route = self.make_route("sampledataset", "var1", "val")
         response = self.send_request(route)
         self.assertEqual(expected, json.loads(response.data))
 
     def test_SearchWorks(self):
+# Unchanged
         expected = ["val1"]
-        route = self.make_request("sampledataset", "var1", "al1")
+        route = self.make_route("sampledataset", "var1", "al1")
         response = self.send_request(route)
         self.assertEqual(expected, json.loads(response.data))
 
     def test_EmptySearchStringReturnsAllVals(self):
+# Unchanged
         expected = ["val1", "val2", "thing3", "thing4"]
-        route = self.make_request("sampledataset", "var1", "")
+        route = self.make_route("sampledataset", "var1", "")
         response = self.send_request(route)
         self.assertEqual(expected, json.loads(response.data))
 
     def test_CanFindValsFromOtherVariables(self):
+# Unchanged
         expected = ["option1", "option2", "option3"]
-        route = self.make_request("sampledataset", "variable1", "")
+        route = self.make_route("sampledataset", "variable1", "")
         response = self.send_request(route)
         self.assertEqual(expected, json.loads(response.data))
 
@@ -178,20 +181,24 @@ class TestSamples(RouteTester):
         return self.post_request(dataset_id, data)
     
     def test_RouteExists(self):
+# Unchanged
         response = self.empty_query()
         self.assertEqual(200, response.status_code)
 
     def test_ResponseIsValidJsonObj(self):
+# Unchanged
         response = self.empty_query()
         obj = json.loads(response.data)
         self.assertEqual(dict, type(obj))
 
     def test_404ErrorForInvalidQueryObject(self):
+# Unchanged
         data = {}
         response = self.post_request("sampledataset", data)
         self.assertEqual(404, response.status_code)
 
     def test_ResponseHasSamplesKey(self):
+# Unchanged
         response = self.empty_query()
         obj = json.loads(response.data)
         self.assertEqual("samples", obj.keys()[0])
@@ -201,11 +208,13 @@ class TestSamples(RouteTester):
     # meta type, and we're assuming that the samples are equally divided 
     # across the three values.
     def test_SamplesIs123ForEmptyQueryObject(self):
+# Unchanged
         response = self.empty_query()
         obj = json.loads(response.data)
         self.assertEqual(123, obj["samples"])
 
     def test_SamplesIs82ForTwoValQuery(self):
+# Unchanged
         data = {"meta": {"variable1": ["option1", "option2"]}}
         response = self.post_request("sampledataset", data)
         obj = json.loads(response.data)
@@ -234,10 +243,12 @@ class TestDownloadFile(RouteTester):
         return self.post_request(dataset_id, data)
     
     def test_RouteExists(self):
+# Unchanged
         response = self.basic_query()
         self.assertEqual(200, response.status_code)
 
     def test_DownloadsCsv(self):
+# Unchanged
         response = self.basic_query()
         self.assertRegexpMatches(response.headers["Content-Type"], "text/csv")
         self.assertRegexpMatches(
@@ -247,7 +258,9 @@ class TestDownloadFile(RouteTester):
         # actual body is a CSV...
 
     def test_CorrectFilename(self):
+# Unchanged
         response = self.basic_query()
         self.assertRegexpMatches(
             response.headers["Content-Disposition"], "filename=example.csv"
         )
+        # TODO: this needs to check multiple filenames

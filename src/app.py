@@ -9,9 +9,9 @@ class MyAPI:
         thing = []
         self.app.add_url_rule('/api/datasets',
                               view_func=self.datasets)
-        self.app.add_url_rule('/api/meta/<string:dataset_id>',
+        self.app.add_url_rule('/api/datasets/<string:dataset_id>/meta',
                               view_func=self.meta)
-        self.app.add_url_rule('/api/meta/<string:dataset_id>/gene', 
+        self.app.add_url_rule('/api/datasets/<string:dataset_id>/meta/<string:meta_type>/search/<string:search>', 
                               view_func=self.gene_search,
                               methods=["GET"])
         self.app.add_url_rule('/api/meta/<string:dataset_id>/metaType/<string:variable>',
@@ -34,8 +34,7 @@ class MyAPI:
     def meta(self, dataset_id):
         return jsonify(self.dao.get_meta(dataset_id))
 
-    def gene_search(self, dataset_id):
-        search = request.args.get('search')
+    def gene_search(self, dataset_id, meta_type, search):
         return jsonify(self.dao.search_genes(search))
 
     def meta_search(self, dataset_id, variable):
@@ -60,7 +59,7 @@ class MyAPI:
         def generate():
             for i in range(100):
                 yield ','.join([c for c in "abcdefghijklmnop"]) + "\n"
-        return Response(generate(), mimetype='text/csv', headers={"Content-Disposition": "attachment; filename=thing.csv"})
+        return Response(generate(), mimetype='text/csv', headers={"Content-Disposition": "attachment; filename=example.csv"})
 
 if __name__ == '__main__':
     from data_access import DataObj
