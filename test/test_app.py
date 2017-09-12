@@ -32,14 +32,14 @@ class TestDatasets(RouteTester):
         super(self.__class__, self).setUp()
         self.response = self.app.get('/api/datasets')
         self.datasets = [{
-                    "numMetaTypes": 1,
-                    "numSamples": 123,
-                    "numGenes": 3,
-                    "description": "#Description\n##This is the Description",
-                    "name": "Sample Dataset",
-                    "id": "sampledataset",
-                    "uploadDate": 1494195717279
-                }]
+            "numMetaTypes": 1,
+            "numSamples": 123,
+            "numGenes": 3,
+            "description": "#Description\n##This is the Description",
+            "name": "Sample Dataset",
+            "id": "sampledataset",
+            "uploadDate": 1494195717279
+        }]
 
     def test_DatasetsRouteExists(self):
         self.assertEqual(self.response.status_code, 200)
