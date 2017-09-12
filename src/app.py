@@ -12,10 +12,7 @@ class MyAPI:
         self.app.add_url_rule('/api/datasets/<string:dataset_id>/meta',
                               view_func=self.meta)
         self.app.add_url_rule('/api/datasets/<string:dataset_id>/meta/<string:meta_type>/search/<string:search>', 
-                              view_func=self.gene_search,
-                              methods=["GET"])
-        self.app.add_url_rule('/api/meta/<string:dataset_id>/metaType/<string:variable>',
-                              view_func=self.meta_search,
+                              view_func=self.search,
                               methods=["GET"])
         self.app.add_url_rule('/api/<string:dataset_id>/samples',
                               view_func=self.samples,
@@ -34,12 +31,16 @@ class MyAPI:
     def meta(self, dataset_id):
         return jsonify(self.dao.get_meta(dataset_id))
 
+    def search(self, dataset_id, meta_type, search):
+        if meta_type == "gene":
+            return self.gene_search(dataset_id, meta_type, search)
+        return self.meta_search(dataset_id, meta_type, search)
+
     def gene_search(self, dataset_id, meta_type, search):
         return jsonify(self.dao.search_genes(search))
 
-    def meta_search(self, dataset_id, variable):
+    def meta_search(self, dataset_id, variable, search):
         vals = self.dao.meta[dataset_id]["meta"][variable]["options"]
-        search = request.args.get('search')
         return jsonify(
             [x for x in vals if search in x]
         )

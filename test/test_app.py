@@ -131,41 +131,30 @@ class TestMetaSearch(RouteTester):
         response = self.app.get(request)
         return response
 
-    def make_route(self, id, variable, search):
-        request = "/api/meta/%s/metaType/%s?search=%s" % (id, variable, search)
+    def make_route(self, id, meta_type, search):
+        request = "/api/datasets/%s/meta/%s/search/%s" % (id, meta_type, search)
         return request
 
     def test_SearchReturns200Response(self):
-# Unchanged
         route = self.make_route("sampledataset", "var1", "val")
         response = self.send_request(route)
         self.assertEqual(200, response.status_code)
 
     def test_ResponseIsAsDefinedByDocumentation(self):
-# Unchanged
         expected = ["val1", "val2"]
         route = self.make_route("sampledataset", "var1", "val")
         response = self.send_request(route)
         self.assertEqual(expected, json.loads(response.data))
 
     def test_SearchWorks(self):
-# Unchanged
         expected = ["val1"]
         route = self.make_route("sampledataset", "var1", "al1")
         response = self.send_request(route)
         self.assertEqual(expected, json.loads(response.data))
 
-    def test_EmptySearchStringReturnsAllVals(self):
-# Unchanged
-        expected = ["val1", "val2", "thing3", "thing4"]
-        route = self.make_route("sampledataset", "var1", "")
-        response = self.send_request(route)
-        self.assertEqual(expected, json.loads(response.data))
-
     def test_CanFindValsFromOtherVariables(self):
-# Unchanged
         expected = ["option1", "option2", "option3"]
-        route = self.make_route("sampledataset", "variable1", "")
+        route = self.make_route("sampledataset", "variable1", "option")
         response = self.send_request(route)
         self.assertEqual(expected, json.loads(response.data))
 
