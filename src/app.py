@@ -14,7 +14,7 @@ class MyAPI:
         self.app.add_url_rule('/api/datasets/<string:dataset_id>/meta/<string:meta_type>/search/<string:search>', 
                               view_func=self.search,
                               methods=["GET"])
-        self.app.add_url_rule('/api/<string:dataset_id>/samples',
+        self.app.add_url_rule('/api/datasets/<string:dataset_id>/samples',
                               view_func=self.samples,
                               methods=["POST"])
         self.app.add_url_rule('/api/<string:dataset_id>/download',
