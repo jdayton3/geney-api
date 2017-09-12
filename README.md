@@ -32,13 +32,13 @@
 {
   "meta": {
     "variable1": {
-      numOptions: 3,
-      options: ["option1","option2","option3"]
+      "numOptions": 3,
+      "options": ["option1","option2","option3"]
     }
   },
   "genes": {
-    numOptions: 190000,
-    options: null
+    "numOptions": 190000,
+    "options": null
   }
 }
 ```
