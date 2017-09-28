@@ -17,9 +17,12 @@ class MyAPI:
         self.app.add_url_rule('/api/datasets/<string:dataset_id>/samples',
                               view_func=self.samples,
                               methods=["POST"])
-        self.app.add_url_rule('/api/<string:dataset_id>/download',
+        self.app.add_url_rule('/api/datasets/<string:dataset_id>/download',
                               view_func=self.download,
                               methods=["POST"])
+        self.app.add_url_rule('/api/datasets/validate',
+                               view_func=self.validate,
+                               methods=['GET'])
         self.app.register_error_handler(404, self.not_found)
 
     def not_found(self, error):
@@ -60,7 +63,20 @@ class MyAPI:
         def generate():
             for i in range(100):
                 yield ','.join([c for c in "abcdefghijklmnop"]) + "\n"
-        return Response(generate(), mimetype='text/csv', headers={"Content-Disposition": "attachment; filename=example.csv"})
+        return Response(
+            generate(), 
+            mimetype='text/csv', 
+            headers={
+                "Content-Disposition": "attachment; filename=example.csv"
+            }
+        )
+    
+    def validate(self):
+        dataset_id = request.args.get("val")
+        return jsonify(
+            self.dao.is_dataset_id_available(dataset_id)
+        )
+
 
 if __name__ == '__main__':
     from data_access import DataObj

@@ -207,7 +207,7 @@ class TestSamples(RouteTester):
 class TestDownloadFile(RouteTester):
     def post_request(self, dataset_id, post_data):
         post_data = json.dumps(post_data)
-        route = "/api/%s/download" % dataset_id
+        route = "/api/datasets/%s/download" % dataset_id
         response = self.app.post(route, data=post_data)
         return response
 
@@ -227,12 +227,10 @@ class TestDownloadFile(RouteTester):
         return self.post_request(dataset_id, data)
     
     def test_RouteExists(self):
-# Unchanged
         response = self.basic_query()
         self.assertEqual(200, response.status_code)
 
     def test_DownloadsCsv(self):
-# Unchanged
         response = self.basic_query()
         self.assertRegexpMatches(response.headers["Content-Type"], "text/csv")
         self.assertRegexpMatches(
@@ -242,9 +240,28 @@ class TestDownloadFile(RouteTester):
         # actual body is a CSV...
 
     def test_CorrectFilename(self):
-# Unchanged
         response = self.basic_query()
         self.assertRegexpMatches(
             response.headers["Content-Disposition"], "filename=example.csv"
         )
         # TODO: this needs to check multiple filenames
+
+class TestValidate(RouteTester):
+    def get_request(self, dataset_id):
+        route = "/api/datasets/validate?val=%s" % dataset_id
+        response = self.app.get(route)
+        return response
+
+    def test_RouteExists(self):
+        response = self.get_request("dataset")
+        self.assertEqual(200, response.status_code)
+
+    def test_ExistingDatasetReturnsFalse(self):
+        response = self.get_request("sampledataset")
+        obj = json.loads(response.data)
+        self.assertFalse(obj)
+
+    def test_NonExistingDatasetReturnsTrue(self):
+        response = self.get_request("doesnotexist")
+        obj = json.loads(response.data)
+        self.assertTrue(obj)
