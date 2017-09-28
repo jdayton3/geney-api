@@ -14,14 +14,15 @@
     "numMetaTypes": 1,
     "numSamples": 123,
     "numGenes": 3,
-    "description": "<h1>Description</h1>",
+    "description": "#Description\n##This is the Description",
     "name": "Sample Dataset",
-    "id": "sampledataset"
+    "id": "sampledataset",
+    "uploadDate": 1494195717279
   }
 ]
 ```
 
-### GET: `/api/meta/id`
+### GET: `/api/datasets/:id/meta`
 
 ##### Query: none
 
@@ -29,36 +30,28 @@
 
 ```js
 {
-    "meta": {
-        "variable1": {
-            "numOptions": 3,
-            "options": ["option1","option2","option3"]
-    },
-    "genes": {
-        "numOptions": 190000,
-        "options": null
+  "meta": {
+    "variable1": {
+      "numOptions": 3,
+      "options": ["option1","option2","option3"]
+    }
+  },
+  "genes": {
+    "numOptions": 190000,
+    "options": null
+  }
 }
 ```
 
 If options is null, that means the front end needs to make a query to the backend whenever the user wants to see the page
 
-### GET: `/api/meta/id/gene?search=str`
+### GET: `/api/datasets/:id/meta/:metaType/search/:str`
 
-##### Query: 	
+##### Query:
 
-- `search`: string to search for in the list of genes
-
-##### Response:
-
-```json
-["gene1","gene2"]
-```
-
-### GET: `/api/meta/id/metaType/var1?search=str`
-
-##### Query: 
-
-- `search`: string to match `metaType[var1]`
+- `:id` ID of dataset
+- `:metaType` Either `gene` or one of the meta value types
+- `:str` the value to search
 
 ##### Response: array of strings that match the search term
 
@@ -66,7 +59,7 @@ If options is null, that means the front end needs to make a query to the backen
 ["val1", "val2"]
 ```
 
-### POST: `/api/id/samples`
+### POST: `/api/datasets/:id/samples`
 
 ##### Query:
 
@@ -90,11 +83,11 @@ JSON object containing the number of samples matched by the filters
 }
 ```
 
-### POST: `/api/id/download`
+### POST: `/api/datasets/:id/download`
 
 ##### Query: 	
 
-JSON object with dataset name, selected meta features, download options, and desired genes. An empty list of genes means the user wants ALL genes.
+JSON object with dataset name, selected meta features, download options, and desired genes. An empty list of genes means the user wants ALL genes. Because the browser needs to download the response as a file, we cannot use a standard `XMLHttpRequest`, and instead must use a regular HTML form. This means that the query will a JSON string, and will need to be parsed as such by the server.
 
 Download options:
 
@@ -104,14 +97,16 @@ Download options:
 
 ```json
 {
-  "meta": {
-    "variable1": ["option1","option3"]
-  },
-  "options": {
-    "fileformat": "csv",
-    "filename": "example"
-  },
-  "genes": []
+  "query": {
+    "meta": {
+	  "variable1": ["option1","option3"]
+    },
+    "genes": [],
+    "options": {
+	  "fileformat": "csv",
+	  "filename": "example"
+    }
+  }
 }
 ```
 
@@ -125,6 +120,40 @@ Set the following headers:
 (Replace the code sections with the correct values.)
 
 The file to be downloaded will be the response body.
+
+### GET:  `/api/datasets/validate?val=id`
+
+##### Response: `true` or `false`, depending on whether or not that id is available
+
+### PUT: `/api/datasets`
+
+##### Query:
+
+The id, title, description, number of metadata columns, and the file that will be used to create a new dataset.
+
+This will be sent as a [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) object to accomodate the file upload.
+
+##### Response: 	
+
+Response code 202 on a successful request, to indicate that it is still processing. The user should be notified via email when the dataset has been processed and is ready for querying. The user's information can be obtained from the JWT (which will need authentication anyways).
+
+### PATCH: `/api/datasets/:id/`
+
+##### Query:
+
+JSON object with the new title and description for the dataset
+
+```json
+{
+  "title": "String",
+  "description": "String"
+}
+```
+
+##### Response: 	
+
+`true` or `false`, depending on the dataset being saved.
+
 
 ## Resources: 
 

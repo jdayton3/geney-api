@@ -62,6 +62,9 @@ class DataObj:
                 n_samples /= 3
         return n_samples
 
+    def is_dataset_id_available(self, dataset_id):
+        return (dataset_id not in self.meta)
+
     # Given an array and a search string, return a new array containing
     # all values containing the search string.
     def find(self, arr, search):

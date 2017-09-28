@@ -9,20 +9,20 @@ class MyAPI:
         thing = []
         self.app.add_url_rule('/api/datasets',
                               view_func=self.datasets)
-        self.app.add_url_rule('/api/meta/<string:dataset_id>',
+        self.app.add_url_rule('/api/datasets/<string:dataset_id>/meta',
                               view_func=self.meta)
-        self.app.add_url_rule('/api/meta/<string:dataset_id>/gene', 
-                              view_func=self.gene_search,
+        self.app.add_url_rule('/api/datasets/<string:dataset_id>/meta/<string:meta_type>/search/<string:search>', 
+                              view_func=self.search,
                               methods=["GET"])
-        self.app.add_url_rule('/api/meta/<string:dataset_id>/metaType/<string:variable>',
-                              view_func=self.meta_search,
-                              methods=["GET"])
-        self.app.add_url_rule('/api/<string:dataset_id>/samples',
+        self.app.add_url_rule('/api/datasets/<string:dataset_id>/samples',
                               view_func=self.samples,
                               methods=["POST"])
-        self.app.add_url_rule('/api/<string:dataset_id>/download',
+        self.app.add_url_rule('/api/datasets/<string:dataset_id>/download',
                               view_func=self.download,
                               methods=["POST"])
+        self.app.add_url_rule('/api/datasets/validate',
+                               view_func=self.validate,
+                               methods=['GET'])
         self.app.register_error_handler(404, self.not_found)
 
     def not_found(self, error):
@@ -34,13 +34,16 @@ class MyAPI:
     def meta(self, dataset_id):
         return jsonify(self.dao.get_meta(dataset_id))
 
-    def gene_search(self, dataset_id):
-        search = request.args.get('search')
+    def search(self, dataset_id, meta_type, search):
+        if meta_type == "gene":
+            return self.gene_search(dataset_id, meta_type, search)
+        return self.meta_search(dataset_id, meta_type, search)
+
+    def gene_search(self, dataset_id, meta_type, search):
         return jsonify(self.dao.search_genes(search))
 
-    def meta_search(self, dataset_id, variable):
+    def meta_search(self, dataset_id, variable, search):
         vals = self.dao.meta[dataset_id]["meta"][variable]["options"]
-        search = request.args.get('search')
         return jsonify(
             [x for x in vals if search in x]
         )
@@ -60,7 +63,20 @@ class MyAPI:
         def generate():
             for i in range(100):
                 yield ','.join([c for c in "abcdefghijklmnop"]) + "\n"
-        return Response(generate(), mimetype='text/csv', headers={"Content-Disposition": "attachment; filename=thing.csv"})
+        return Response(
+            generate(), 
+            mimetype='text/csv', 
+            headers={
+                "Content-Disposition": "attachment; filename=example.csv"
+            }
+        )
+    
+    def validate(self):
+        dataset_id = request.args.get("val")
+        return jsonify(
+            self.dao.is_dataset_id_available(dataset_id)
+        )
+
 
 if __name__ == '__main__':
     from data_access import DataObj
