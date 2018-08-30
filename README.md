@@ -1,6 +1,6 @@
 # Geney Server API
 
-[Main repository](https://github.com/srp33/Geney).
+Archived in favor of the [main repository](https://github.com/srp33/Geney).
 
 ### GET:  `/api/datasets`
 
